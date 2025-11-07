@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build_wayland_client",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "wayland_echo"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Runs 'make wayland_echo' to build the Wayland client using the provided Makefile."
+        }
+    ]
+}

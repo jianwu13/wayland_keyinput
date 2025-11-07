@@ -1,0 +1,17 @@
+[user]
+        name = JianWu
+        email = JianWuUb@ybb.ne.jp
+[core]
+        editor = code
+[merge]
+        tool = meld
+[mergetool "meld"]
+        cmd = meld "$LOCAL" "$MERGED" "$REMOTE" --output "$MERGED"
+[mergetool "meld"]
+        trustExitCode = false
+[diff]
+        tool = meld
+[difftool]
+        Prompt = false
+[difftool "meld"]
+        cmd = meld "$LOCAL" "$REMOTE"
