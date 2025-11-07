@@ -30,19 +30,19 @@ Confirmed to be working on Ubuntu 25.10.
 
 ## Generate the Header File Manually:
 
-    ```bash
+    
     dpkg -L wayland-protocols | grep xdg-shell.xml
-    ```
+    
 
 Expected output path is likely similar to: /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
 
 Replace the path below with the actual path found via dpkg -L
 
-    ```bash
+    
     wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-client-protocol.h
-    ```
+    
 ## Generate the Protocol C Implementation
 
-    ```bash
+    
     wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-protocol.c
-    ```
+    
