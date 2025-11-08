@@ -8,6 +8,18 @@ It was created using Gemini.
 
 Confirmed to be working on Ubuntu 25.10.
 
+## Prerequisite
+| Library Package   | Role in Code | apt install Command |
+| :-------: | ---------------- | ------ |
+|libwayland-dev|Provides the core libwayland-client.so and header files (wayland-client.h) for connecting to the compositor.|sudo apt install libwayland-dev|
+|libxkbcommon-dev|Provides the libxkbcommon.so and headers needed for translating raw key events into characters.|sudo apt install libxkbcommon-dev|
+|libwayland-protocols-dev|Provides the XML definitions (xdg-shell.xml) and the necessary internal linking symbols for protocols like XDG Shell and wl_shm.|sudo apt install libwayland-protocols-dev|
+|wayland-scanner|The utility program used to automatically generate the .h and .c files from the protocol XML definitions.|sudo apt install wayland-scanner|
+
+Ubuntu25.10 don't have libwayland-protocols-dev. Need wayland-protocols installed.
+
+And need to generate xdg-shell-client-protocol.h and xdg-shell-protocol.c from xdg-shell.xml
+
 ## Build Instructions
 
 - Clone the [wayland_keyinput repository](https://github.com/jianwu13/wayland_keyinput.git):
@@ -45,4 +57,12 @@ Replace the path below with the actual path found via dpkg -L
 
     
     wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-protocol.c
-    
+
+## Tips
+### Finding Development Libraries for Header Files
+
+    $ sudo apt-file update
+
+    $ apt-file search <header_file.h>
+
+    $ apt-file find <header_file.h>
