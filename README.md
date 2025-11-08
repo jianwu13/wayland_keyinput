@@ -1,68 +1,101 @@
-# wayland_keyinput
+# wayland\_keyinput
 
-## About
-This sample program uses the Wayland C library to retrieve and display key inputs.
-It was created using Gemini.
+## 🌟 About
+This project provides a minimal, self-contained **Wayland C client** designed to **capture and display keyboard input** using the XDG Shell and `libxkbcommon`. It serves as a tested and verified example for setting up complex Wayland dependencies from scratch.
 
-![Wayland_Keyinput](doc/Wayland_Keyinput.png)
+This client was created with the assistance of the Gemini AI model.
 
-Confirmed to be working on Ubuntu 25.10.
+| Feature | Status |
+| :--- | :--- |
+| **Functionality** | Keyboard echo test (key presses output to console) |
+| **Confirmed OS** | Ubuntu 25.10 (Development Release) |
+| **License** | MIT |
 
-## Prerequisite
-| Library Package   | Role in Code | apt install Command |
-| :-------: | ---------------- | ------ |
-|libwayland-dev|Provides the core libwayland-client.so and header files (wayland-client.h) for connecting to the compositor.|sudo apt install libwayland-dev|
-|libxkbcommon-dev|Provides the libxkbcommon.so and headers needed for translating raw key events into characters.|sudo apt install libxkbcommon-dev|
-|libwayland-protocols-dev|Provides the XML definitions (xdg-shell.xml) and the necessary internal linking symbols for protocols like XDG Shell and wl_shm.|sudo apt install libwayland-protocols-dev|
-|wayland-scanner|The utility program used to automatically generate the .h and .c files from the protocol XML definitions.|sudo apt install wayland-scanner|
+!(doc/Wayland_Keyinput.png)
 
-Ubuntu25.10 don't have libwayland-protocols-dev. Need wayland-protocols installed.
+---
 
-And need to generate xdg-shell-client-protocol.h and xdg-shell-protocol.c from xdg-shell.xml
+## 📦 Prerequisites
 
-## Build Instructions
+To build and run this client, you need the following development packages installed.
 
-- Clone the [wayland_keyinput repository](https://github.com/jianwu13/wayland_keyinput.git):
+### 1. Essential Development Libraries
 
-    ```bash
-    git clone git@github.com:jianwu13/wayland_keyinput.git
-    ```
+| Library Package | Role in Code | Installation Command |
+| :--- | :--- | :--- |
+| **`libwayland-dev`** | Core Wayland API (connecting, registry). | `sudo apt install libwayland-dev` |
+| **`libxkbcommon-dev`** | Translating raw key events to characters. | `sudo apt install libxkbcommon-dev` |
+| **`wayland-protocols`** | Provides the source **XML definitions** (`xdg-shell.xml`). | `sudo apt install wayland-protocols` |
+| **`wayland-scanner`** | Tool used to generate C code from protocol XML files. | `sudo apt install wayland-scanner` |
 
-- make
+### 2. Note on Protocol Files
 
-    ```bash
-    make
-    ```
+Due to inconsistencies in some distribution packages (like Ubuntu 25.10), the necessary **header and source files** for the XDG Shell protocol may not be installed.
 
-	or
+Therefore, the protocol files must be **generated manually** using `wayland-scanner` before compilation (see Build Instructions below).
 
-    ```bash
-    gcc wayland_echo.c xdg-shell-protocol.c -o wayland_echo $(pkg-config --cflags --libs wayland-client xkbcommon)
-    ```
+---
 
-## Generate the Header File Manually:
+## 🛠️ Build Instructions
 
-    
-    dpkg -L wayland-protocols | grep xdg-shell.xml
-    
+### 1. Clone the Repository
 
-Expected output path is likely similar to: /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+```bash
+git clone git@github.com:jianwu13/wayland_keyinput.git
+cd wayland_keyinput
+```
 
-Replace the path below with the actual path found via dpkg -L
+### 2. Generate Protocol Source Files
 
-    
-    wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-client-protocol.h
-    
-## Generate the Protocol C Implementation
+First, verify the path to the protocol XML file:
 
-    
-    wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-protocol.c
+```bash
+dpkg -L wayland-protocols | grep xdg-shell.xml
+# Expected path: /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+```
 
-## Tips
-### Finding Development Libraries for Header Files
+Next, use `wayland-scanner` to generate the required C files (replace the path if your system is different):
 
-    $ sudo apt-file update
+```bash
+# Generate the header file (for the compiler to read)
+wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-client-protocol.h
 
-    $ apt-file search <header_file.h>
+# Generate the C implementation file (for the linker)
+wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-protocol.c
+```
 
-    $ apt-file find <header_file.h>
+### 3. Compile the Executable
+
+You must link both the main C file and the generated protocol C file.
+
+* **Using `make` (Recommended):**
+```bash
+make
+```
+
+* **Using `gcc` Directly:**
+```bash
+gcc wayland_echo.c xdg-shell-protocol.c -o wayland_echo $(pkg-config --cflags --libs wayland-client xkbcommon)
+```
+
+---
+
+## 🏃 Running the Client
+
+Ensure you are running the program from within a Wayland session (e.g., inside a terminal that is running on your Wayland compositor).
+
+```bash
+./wayland_echo
+```
+
+A small **solid gray window** will appear. **Click inside the window** to give it keyboard focus, and then type keys to see the echo output (e.g., "Key Pressed: 'a'") in your terminal.
+
+---
+
+## 💡 Troubleshooting Tips
+
+If you encounter errors related to **`pkg-config`** not finding libraries, ensure you've installed all the necessary **`-dev`** packages listed in the **Prerequisites** section.
+
+If the window is invisible or you experience crashes when clicking outside the window, review the `wayland_echo.c` source code to confirm the following fixes are present:
+1.  **Buffer Filling:** The `create_buffer` function must explicitly fill the memory with a non-transparent color (e.g., `0xFF999999`).
+2.  **Focus Handlers:** The `wl_keyboard_listener` must have non-`NULL` functions assigned to both the `.enter` (opcode 1) and `.leave` (opcode 2) events.
